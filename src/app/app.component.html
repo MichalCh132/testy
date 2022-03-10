@@ -1,2 +1,7 @@
 Input file:  <input type="file" (change)="onFileInputChange($event)">
-<table [innerHTML]="datasheetTableInnerHTML" id="table" *ngIf="datasheetTableInnerHTML !== ''"></table>
+<table [innerHTML]="datasheetTableInnerHTML" id="table" *ngIf="datasheetTableInnerHTML !== ''"
+    (click)="onTableClick($event)"></table>
+<br>
+<br>
+<input type="button" value="Send table to database" *ngIf="datasheetTableInnerHTML !== ''"
+        (click)="sendDataToBackend($event)">

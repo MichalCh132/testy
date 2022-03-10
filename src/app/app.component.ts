@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, Renderer2} from '@angular/core';
 import { ExcelReaderService } from './services/excel-reader.service';
 import * as XLSX from 'xlsx';
 
@@ -14,7 +14,7 @@ export class AppComponent {
   datasheetTableInnerHTML: string = '';
 
 
-  constructor(private excelReader: ExcelReaderService){
+  constructor(private excelReader: ExcelReaderService, private renderer: Renderer2){
       this.datasheet$.subscribe( datasheet => {
         const sheetName = datasheet.SheetNames[0];
         const sheet = datasheet.Sheets[sheetName];
@@ -38,5 +38,22 @@ export class AppComponent {
     if(file){
       this.excelReader.readFile(file);
     }
+  }
+
+  onTableClick(event: MouseEvent): void {
+    const element = event.target as HTMLElement;
+    if(element.tagName === 'TD'){
+      this.renderer.addClass(element, 'border-red');
+    }
+  }
+
+  sendDataToBackend(event: MouseEvent): void {
+    this.excelReader.sendDataToBackend((event.target as HTMLElement).innerText).then( (data) => {
+        this.showData(data);
+    });
+  }
+
+  showData(data: string){
+    window.alert(data);
   }
 }

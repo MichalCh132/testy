@@ -21,4 +21,12 @@ export class ExcelReaderService {
     };
     const arrayBufferFile = fileReader.readAsArrayBuffer(file);
   }
+
+  sendDataToBackend(data: string): Promise<string> {
+    return new Promise<string>( resolve => {
+      setTimeout( () => {
+        resolve('Udalo sie otrzymac dane');
+      }, 1500)
+    })
+  }
 }

@@ -1,0 +1,9 @@
+table::ng-deep{
+  background-color: #f1f1f1;
+  td{
+    &.border-red{
+      border: 1px solid red;
+    }
+  }
+}
+

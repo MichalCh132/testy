@@ -7,7 +7,7 @@ import * as XLSX from 'xlsx';
 
 describe('AppComponent', () => {
 
-  const mockToolBarService = jasmine.createSpyObj(['datasheet$']);
+  const mockToolBarService = jasmine.createSpyObj('service', ['sendDataToBackend']);
   mockToolBarService.datasheet$ = new Subject<XLSX.WorkBook>();
 
   beforeEach(async () => {
@@ -33,22 +33,76 @@ describe('AppComponent', () => {
     expect(tableHTMLElement!.innerHTML).toContain('td');
   }));
 
-  it('should NOT render table if worksheet is NOT provided', fakeAsync(() => {
+  it('should NOT render table if worksheet is NOT provided', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     let tableHTMLElement = document.querySelector('#table');
-    expect(tableHTMLElement).toBeFalsy;
-  }));
+    expect(tableHTMLElement).toBeFalsy();
+  });
 
-  it('should have 12 tds in table if there is 4x3 sheet provided', fakeAsync(() => {
+  it('should have 12 tds in table if there is 4x3 sheet provided', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
 
     mockToolBarService.datasheet$.next(exampleSheetJSObject);
-    tick(10);
     fixture.detectChanges();
     const tableHTMLElement = document.querySelector('#table');
     expect(tableHTMLElement!.querySelectorAll('td').length).toEqual(12);
+  });
+
+  it('should add "border-red" class on td click', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+
+    mockToolBarService.datasheet$.next(exampleSheetJSObject);
+    fixture.detectChanges();
+
+    const tableHTMLElement = document.querySelector('#table');
+    const td = tableHTMLElement!.querySelector('td')!;
+    expect(td.classList).not.toContain('border-red');
+    td.click();
+    expect(td.classList).toContain('border-red');
+  });
+
+  it('should add "border-red" class on td click', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+
+    mockToolBarService.datasheet$.next(exampleSheetJSObject);
+    fixture.detectChanges();
+
+    const tableHTMLElement = document.querySelector('#table');
+    const td = tableHTMLElement!.querySelector('td')!;
+    expect(td.classList).not.toContain('border-red');
+    td.click();
+    expect(td.classList).toContain('border-red');
+  });
+
+  it('should show data after button click', fakeAsync(() => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    app.datasheetTableInnerHTML = '<table></table>'
+
+    mockToolBarService.sendDataToBackend.and.returnValue(new Promise( resolve => {
+      setTimeout( () => {
+        resolve('Udalo sie otrzymac dane');
+      }, 1500)
+    }))
+
+    const sendToBackendSpy = spyOn(app, 'sendDataToBackend').and.callThrough();
+    const showDataSpy = spyOn(app, 'showData').and.callThrough();
+    const alertSpy = spyOn(window, 'alert');
+
+
+    mockToolBarService.datasheet$.next(exampleSheetJSObject);
+    fixture.detectChanges();
+
+    const button = document.querySelector('input[type="button"]')! as HTMLButtonElement;
+    button.click();
+    expect(sendToBackendSpy).toHaveBeenCalled();
+    tick(2000);
+    expect(showDataSpy).toHaveBeenCalled();
+    expect(alertSpy).toHaveBeenCalled();
   }));
 });
 
